@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Juegos para practicar Inglés con Emojis</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #6a11cb, #2575fc);
+      color: white;
+      text-align: center;
+      padding: 20px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: center;
+    }
+
+    h1 {
+      margin-bottom: 20px;
+    }
+
+    .game {
+      display: none;
+      margin-top: 30px;
+      width: 320px;
+      background: rgba(255, 255, 255, 0.15);
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+    }
+
+    .options button {
+      display: inline-block;
+      margin: 10px 10px;
+      padding: 10px 20px;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      background: white;
+      color: #2575fc;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .options button:hover {
+      background: #ffeb3b;
+      color: black;
+    }
+
+    .message {
+      margin-top: 15px;
+      font-weight: bold;
+      font-size: 18px;
+      min-height: 40px;
+    }
+
+    .emoji {
+      font-size: 70px;
+      margin: 15px;
+      min-height: 100px;
+    }
+
+    .counter {
+      margin-top: 10px;
+      font-size: 16px;
+      font-weight: bold;
+    }
+
+    .menu {
+      margin-bottom: 10px;
+    }
+
+    .menu button {
+      margin: 5px;
+      padding: 10px 15px;
+      border: none;
+      border-radius: 6px;
+      background: #ff9800;
+      color: white;
+      cursor: pointer;
+      font-weight: bold;
+      transition: 0.3s;
+    }
+
+    .menu button:hover {
+      background: #e65100;
+    }
+
+    #restart-btn, .back-menu-btn {
+      margin-top: 20px;
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #ff9800;
+      border: none;
+      border-radius: 6px;
+      color: white;
+      cursor: pointer;
+      font-weight: bold;
+      transition: 0.3s;
+    }
+
+    #restart-btn:hover, .back-menu-btn:hover {
+      background-color: #e65100;
+    }
+
+    /* For sentence game options, show buttons inline */
+    #sentence-options button {
+      margin: 5px 7px;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+  </style>
+</head>
+<body>
+  <h1>🎮 Juegos para practicar Inglés</h1>
+
+  <div class="menu" id="menu">
+    <p><strong>Elige un juego:</strong></p>
+    <button onclick="showGame('prepositions')">Prepositions</button>
+    <button onclick="showGame('translations')">Translations</button>
+    <button onclick="showGame('sentence')">Sentence Order</button>
+  </div>
+
+  <!-- Juego 1: Prepositions -->
+  <div id="prepositions" class="game">
+    <p><strong>Where is the ball relative to the box?</strong></p>
+    <div class="emoji" id="prep-emoji"></div>
+    <div class="options" id="prep-options"></div>
+    <p class="message" id="prep-message"></p>
+    <p class="counter" id="prep-counter">Correct answers: 0</p>
+    <button id="prep-restart-btn" class="hidden" onclick="restartPrepositions()">🔄 Restart Game</button>
+    <button class="back-menu-btn hidden" onclick="backToMenu('prepositions')">⬅ Back to Menu</button>
+  </div>
+
+  <!-- Juego 2: Translations -->
+  <div id="translations" class="game">
+    <h2>🌍 Translations</h2>
+    <p id="trans-question"></p>
+    <div class="emoji" id="trans-emoji"></div>
+    <div class="options" id="trans-options"></div>
+    <p class="message" id="trans-message"></p>
+    <p class="counter" id="trans-counter">Correct answers: 0</p>
+    <button id="trans-restart-btn" class="hidden" onclick="restartTranslations()">🔄 Restart Game</button>
+    <button class="back-menu-btn hidden" onclick="backToMenu('translations')">⬅ Back to Menu</button>
+  </div>
+
+  <!-- Juego 3: Sentence Order -->
+  <div id="sentence" class="game">
+    <h2>📝 Sentence Order</h2>
+    <p>Put the words in the correct order to form a sentence:</p>
+    <p id="sentence-question"></p>
+    <p id="sentence-translation"></p>
+    <div class="emoji" id="sentence-emoji"></div>
+    <div class="options" id="sentence-options"></div>
+    <p class="message" id="sentence-message"></p>
+    <p class="counter" id="sentence-counter">Correct answers: 0</p>
+    <button id="sentence-restart-btn" class="hidden" onclick="restartSentence()">🔄 Restart Game</button>
+    <button class="back-menu-btn hidden" onclick="backToMenu('sentence')">⬅ Back to Menu</button>
+  </div>
+
+  <script>
+    // Show selected game, hide menu and others
+    function showGame(gameId) {
+      document.getElementById('menu').style.display = 'none';
+      document.querySelectorAll('.game').forEach(g => {
+        g.style.display = 'none';
+        g.querySelectorAll('button#prep-restart-btn, button#trans-restart-btn, button#sentence-restart-btn, .back-menu-btn').forEach(b => b.classList.add('hidden'));
+      });
+      const gameDiv = document.getElementById(gameId);
+      gameDiv.style.display = 'block';
+
+      if (gameId === 'prepositions') {
+        loadPrepositions();
+      } else if (gameId === 'translations') {
+        loadTranslations();
+      } else if (gameId === 'sentence') {
+        loadSentence();
+      }
+    }
+
+    function backToMenu(gameId) {
+      document.getElementById(gameId).style.display = 'none';
+      document.getElementById('menu').style.display = 'block';
+    }
+
+    /* ----------------------------------------------------
+       Game 1: Prepositions
+    ------------------------------------------------------*/
+    const prepositions = [
+      { html: `<div style="line-height: 0.8; font-size: 70px;">⚽<br />📦</div>`, correct: "on" },
+      { html: `<div style="line-height: 0.8; font-size: 70px;">📦<br />⚽</div>`, correct: "under" },
+      { html: `<div style="font-size: 70px;">📦⚽</div>`, correct: "next to" },
+      { html: `<div style="font-size: 70px;">⚽📦</div>`, correct: "next to" },
+      { html: `<div style="line-height: 0.8; font-size: 70px;">⚽<br />📦</div>`, correct: "under" }
+    ];
+
+    let prepIndex = 0;
+    let prepCorrectCount = 0;
+
+    function loadPrepositions() {
+      const emojiElem = document.getElementById("prep-emoji");
+      const optionsContainer = document.getElementById("prep-options");
+      const messageElem = document.getElementById("prep-message");
+      const counterElem = document.getElementById("prep-counter");
+      const restartBtn = document.getElementById("prep-restart-btn");
+      const backMenuBtn = document.querySelector("#prepositions .back-menu-btn");
+
+      if (prepIndex >= prepositions.length) {
+        emojiElem.innerHTML = "🎉";
+        messageElem.textContent = `Game over! Final score: ${prepCorrectCount} of ${prepositions.length}`;
+        optionsContainer.innerHTML = "";
+        restartBtn.classList.remove("hidden");
+        backMenuBtn.classList.remove("hidden");
+        return;
+      }
+
+      const p = prepositions[prepIndex];
+      emojiElem.innerHTML = p.html;
+      messageElem.textContent = "";
+      counterElem.textContent = `Correct answers: ${prepCorrectCount}`;
+      optionsContainer.innerHTML = "";
+
+      const options = ["on", "under", "next to"];
+      options.forEach(opt => {
+        const btn = document.createElement("button");
+        btn.textContent = opt;
+        btn.onclick = () => checkPreposition(opt);
+        optionsContainer.appendChild(btn);
+      });
+    }
+
+    function checkPreposition(answer) {
+      const p = prepositions[prepIndex];
+      const messageElem = document.getElementById("prep-message");
+      const counterElem = document.getElementById("prep-counter");
+
+      if (answer === p.correct) {
+        messageElem.textContent = "✅ Correct!";
+        prepCorrectCount++;
+      } else {
+        messageElem.textContent = `❌ Wrong. Correct answer: ${p.correct}`;
+      }
+
+      counterElem.textContent = `Correct answers: ${prepCorrectCount}`;
+      prepIndex++;
+      setTimeout(loadPrepositions, 1500);
+    }
+
+    function restartPrepositions() {
+      prepIndex = 0;
+      prepCorrectCount = 0;
+      document.getElementById("prep-message").textContent = "";
+      document.getElementById("prep-counter").textContent = "Correct answers: 0";
+      document.getElementById("prep-restart-btn").classList.add("hidden");
+      document.querySelector("#prepositions .back-menu-btn").classList.add("hidden");
+      loadPrepositions();
+    }
+
+    /* ----------------------------------------------------
+       Game 2: Translations
+    ------------------------------------------------------*/
+    const translations = [
+      { q: "Dog", emoji: "🐕", options: ["Dog", "Cat", "Bird"], correct: "Dog" },
+      { q: "House", emoji: "🏠", options: ["House", "Table", "Door"], correct: "House" },
+      { q: "Car", emoji: "🚗", options: ["Plane", "Car", "Train"], correct: "Car" }
+    ];
+
+    let transIndex = 0;
+    let transCorrectCount = 0;
+
+    function loadTranslations() {
+      const qElem = document.getElementById("trans-question");
+      const emojiElem = document.getElementById("trans-emoji");
+      const optionsContainer = document.getElementById("trans-options");
+      const messageElem = document.getElementById("trans-message");
+      const counterElem = document.getElementById("trans-counter");
+      const restartBtn = document.getElementById("trans-restart-btn");
+      const backMenuBtn = document.querySelector("#translations .back-menu-btn");
+
+      if (transIndex >= translations.length) {
+        emojiElem.innerHTML = "🎉";
+        messageElem.textContent = `Game over! Final score: ${transCorrectCount} of ${translations.length}`;
+        optionsContainer.innerHTML = "";
+        restartBtn.classList.remove("hidden");
+        backMenuBtn.classList.remove("hidden");
+        return;
+      }
+
+      const t = translations[transIndex];
+      qElem.textContent = `Which is the correct English word for this emoji?`;
+      emojiElem.textContent = t.emoji;
+      messageElem.textContent = "";
+      counterElem.textContent = `Correct answers: ${transCorrectCount}`;
+      optionsContainer.innerHTML = "";
+
+      t.options.forEach(opt => {
+        const btn = document.createElement("button");
+        btn.textContent = opt;
+        btn.onclick = () => checkTranslation(opt);
+        optionsContainer.appendChild(btn);
+      });
+    }
+
+    function checkTranslation(answer) {
+      const t = translations[transIndex];
+      const messageElem = document.getElementById("trans-message");
+      const counterElem = document.getElementById("trans-counter");
+
+      if (answer === t.correct) {
+        messageElem.textContent = "✅ Correct!";
+        transCorrectCount++;
+      } else {
+        messageElem.textContent = `❌ Wrong. Correct answer: ${t.correct}`;
+      }
+
+      counterElem.textContent = `Correct answers: ${transCorrectCount}`;
+      transIndex++;
+      setTimeout(loadTranslations, 1500);
+    }
+
+    function restartTranslations() {
+      transIndex = 0;
+      transCorrectCount = 0;
+      document.getElementById("trans-message").textContent = "";
+      document.getElementById("trans-counter").textContent = "Correct answers: 0";
+      document.getElementById("trans-restart-btn").classList.add("hidden");
+      document.querySelector("#translations .back-menu-btn").classList.add("hidden");
+      loadTranslations();
+    }
+
+    /* ----------------------------------------------------
+       Game 3: Sentence Order
+    ------------------------------------------------------*/
+    const sentences = [
+      {
+        words: ["cat", "was", "the","happy" ],
+        correct: "the cat was happy",
+        translation: "El gato estaba feliz",
+        emoji: "😺"
+      },
+      {
+        words: ["in", "ballet", "they" , "were"],
+        correct: "they were in ballet",
+        translation: "Ellas estaban en ballet",
+        emoji: "👯"
+      },
+      {
+        words: ["angry", "was", "he"],
+        correct: "he was angry",
+        translation: "El estaba enojado",
+        emoji: "😡"
+      }
+      
+    ];
+
+    let sentenceIndex = 0;
+    let sentenceCorrectCount = 0;
+    let currentOrder = [];
+
+    function loadSentence() {
+      const questionElem = document.getElementById("sentence-question");
+      const translationElem = document.getElementById("sentence-translation");
+      const emojiElem = document.getElementById("sentence-emoji");
+      const optionsContainer = document.getElementById("sentence-options");
+      const messageElem = document.getElementById("sentence-message");
+      const counterElem = document.getElementById("sentence-counter");
+      const restartBtn = document.getElementById("sentence-restart-btn");
+      const backMenuBtn = document.querySelector("#sentence .back-menu-btn");
+
+      if (sentenceIndex >= sentences.length) {
+        emojiElem.textContent = "🎉";
+        messageElem.textContent = `Game over! Final score: ${sentenceCorrectCount} of ${sentences.length}`;
+        optionsContainer.innerHTML = "";
+        restartBtn.classList.remove("hidden");
+        backMenuBtn.classList.remove("hidden");
+        return;
+      }
+
+      const s = sentences[sentenceIndex];
+      questionElem.textContent = "Select the words in the correct order to form the sentence:";
+      translationElem.textContent = "Translation: " + s.translation;
+      emojiElem.textContent = s.emoji;
+      messageElem.textContent = "";
+      counterElem.textContent = `Correct answers: ${sentenceCorrectCount}`;
+      optionsContainer.innerHTML = "";
+      currentOrder = [];
+
+      let shuffled = s.words.slice().sort(() => Math.random() - 0.5);
+
+      shuffled.forEach(word => {
+        const btn = document.createElement("button");
+        btn.textContent = word;
+        btn.onclick = () => {
+          currentOrder.push(word);
+          btn.disabled = true;
+          checkSentenceOrder();
+        };
+        optionsContainer.appendChild(btn);
+      });
+    }
+
+    function checkSentenceOrder() {
+      const s = sentences[sentenceIndex];
+      const messageElem = document.getElementById("sentence-message");
+      const counterElem = document.getElementById("sentence-counter");
+
+      if (currentOrder.length === s.words.length) {
+        const answer = currentOrder.join(" ");
+        if (answer === s.correct) {
+          messageElem.textContent = "✅ Correct!";
+          sentenceCorrectCount++;
+        } else {
+          messageElem.textContent = `❌ Wrong. Correct answer: ${s.correct}`;
+        }
+        counterElem.textContent = `Correct answers: ${sentenceCorrectCount}`;
+
+        sentenceIndex++;
+        setTimeout(loadSentence, 2000);
+      }
+    }
+
+    function restartSentence() {
+      sentenceIndex = 0;
+      sentenceCorrectCount = 0;
+      document.getElementById("sentence-message").textContent = "";
+      document.getElementById("sentence-counter").textContent = "Correct answers: 0";
+      document.getElementById("sentence-restart-btn").classList.add("hidden");
+      document.querySelector("#sentence .back-menu-btn").classList.add("hidden");
+      loadSentence();
+    }
+  </script>
+</body>
+</html>
+ 

@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Juegos de Inglés</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #6a11cb, #2575fc);
+      color: white;
+      text-align: center;
+      padding: 20px;
+    }
+
+    h1 { margin-bottom: 20px; }
+
+    .game { display: none; margin-top: 30px; }
+
+    .options button {
+      display: block;
+      margin: 10px auto;
+      padding: 10px 20px;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      background: white;
+      color: #2575fc;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .options button:hover { background: #ffeb3b; color: black; }
+
+    .message { margin-top: 15px; font-weight: bold; }
+
+    .menu button {
+      margin: 5px;
+      padding: 10px 15px;
+      border: none;
+      border-radius: 6px;
+      background: #ff9800;
+      color: white;
+      cursor: pointer;
+    }
+
+    .menu button:hover { background: #e65100; }
+
+    .img-box img {
+      width: 220px;
+      margin: 15px auto;
+      display: block;
+      border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+      background: white;
+    }
+  </style>
+</head>
+<body>
+  <h1>🎮 Juegos para practicar Inglés</h1>
+
+  <div class="menu">
+    <p>Elige un juego:</p>
+    <button onclick="showGame('prepositions')">Prepositions</button>
+    <button onclick="showGame('translations')">Translations</button>
+    <button onclick="showGame('sentence')">Sentence Order</button>
+  </div>
+
+  <!-- Juego 1: Preposiciones -->
+  <div id="prepositions" class="game">
+    <h2>📘 Prepositions</h2>
+    <p id="prep-question"></p>
+    <p id="prep-translation"></p>
+    <div class="img-box"><img id="prep-img" src="" alt="Imagen"></div>
+    <div class="options" id="prep-options"></div>
+    <p class="message" id="prep-message"></p>
+  </div>
+
+  <!-- Juego 2: Traducciones -->
+  <div id="translations" class="game">
+    <h2>🌍 Translations</h2>
+    <p id="trans-question"></p>
+    <div class="emoji" id="trans-emoji"></div>
+    <div class="options" id="trans-options"></div>
+    <p class="message" id="trans-message"></p>
+  </div>
+
+  <!-- Juego 3: Ordenar oraciones -->
+  <div id="sentence" class="game">
+    <h2>📝 Sentence Order</h2>
+    <p>Ordena las palabras para formar una oración correcta:</p>
+    <p id="sentence-question"></p>
+    <p id="sentence-translation"></p>
+    <div class="emoji" id="sentence-emoji"></div>
+    <div class="options" id="sentence-options"></div>
+    <p class="message" id="sentence-message"></p>
+  </div>
+
+  <script>
+    function showGame(gameId) {
+      document.querySelectorAll(".game").forEach(g => g.style.display = "none");
+      document.getElementById(gameId).style.display = "block";
+      if (gameId === "prepositions") loadPrepositions();
+      if (gameId === "translations") loadTranslations();
+      if (gameId === "sentence") loadSentence();
+    }
+
+    // Juego 1: Preposiciones con imágenes locales
+    const prepositions = [
+      {
+        q: "The book is ___ the table.",
+        es: "El libro está ___ la mesa.",
+        img: "book_under_table.jpg",
+        options: ["on", "under", "between"],
+        correct: "under"
+      },
+      {
+        q: "The cat is ___ the chair.",
+        es: "El gato está ___ la silla.",
+        img: "cat_under_chair.jpg",
+        options: ["behind", "in", "on"],
+        correct: "behind"
+      },
+      {
+        q: "The ball is ___ the box.",
+        es: "La pelota está ___ la caja.",
+        img: "ball_in_box.jpg",
+        options: ["on", "in", "under"],
+        correct: "in"
+      }
+    ];
+    let prepIndex = 0;
+
+    function loadPrepositions() {
+      const qElem = document.getElementById("prep-question");
+      const esElem = document.getElementById("prep-translation");
+      const imgElem = document.getElementById("prep-img");
+      const optionsContainer = document.getElementById("prep-options");
+      const messageElem = document.getElementById("prep-message");
+
+      if (prepIndex >= prepositions.length) {
+        qElem.textContent = "🎉 Juego terminado!";
+        optionsContainer.innerHTML = "";
+        esElem.textContent = "";
+        imgElem.src = "";
+        messageElem.textContent = "";
+        return;
+      }
+      const p = prepositions[prepIndex];
+      qElem.textContent = p.q;
+      esElem.textContent = p.es;
+      imgElem.src = p.img;
+      optionsContainer.innerHTML = "";
+      messageElem.textContent = "";
+      p.options.forEach(opt => {
+        const btn = document.createElement("button");
+        btn.textContent = opt;
+        btn.onclick = () => checkPreposition(opt);
+        optionsContainer.appendChild(btn);
+      });
+    }
+
+    function checkPreposition(answer) {
+      const p = prepositions[prepIndex];
+      const messageElem = document.getElementById("prep-message");
+      if (answer === p.correct) {
+        messageElem.textContent = "✅ Correct!";
+      } else {
+        messageElem.textContent = "❌ Wrong! Correct: " + p.correct;
+      }
+      prepIndex++;
+      setTimeout(loadPrepositions, 1500);
+    }
+
+    // Juego 2: Traducciones
+    const translations = [
+      { q: "Dog", emoji: "🐕", options: ["Perro", "Gato", "Pájaro"], correct: "Perro" },
+      { q: "House", emoji: "🏠", options: ["Casa", "Mesa", "Puerta"], correct: "Casa" },
+      { q: "Car", emoji: "🚗", options: ["Avión", "Auto", "Tren"], correct: "Auto" }
+    ];
+    let transIndex = 0;
+
+    function loadTranslations() {
+      const qElem = document.getElementById("trans-question");
+      const emojiElem = document.getElementById("trans-emoji");
+      const optionsContainer = document.getElementById("trans-options");
+      const messageElem = document.getElementById("trans-message");
+
+      if (transIndex >= translations.length) {
+        qElem.textContent = "🎉 Juego terminado!";
+        optionsContainer.innerHTML = "";
+        emojiElem.innerHTML = "";
+        messageElem.textContent = "";
+        return;
+      }
+      const t = translations[transIndex];
+      qElem.textContent = "Translate: " + t.q;
+      emojiElem.innerHTML = t.emoji;
+      optionsContainer.innerHTML = "";
+      messageElem.textContent = "";
+      t.options.forEach(opt => {
+        const btn = document.createElement("button");
+        btn.textContent = opt;
+        btn.onclick = () => checkTranslation(opt);
+        optionsContainer.appendChild(btn);
+      });
+    }
+
+    function checkTranslation(answer) {
+      const t = translations[transIndex];
+      const messageElem = document.getElementById("trans-message");
+      if (answer === t.correct) {
+        messageElem.textContent = "✅ Correct!";
+      } else {
+        messageElem.textContent = "❌ Wrong! Correct: " + t.correct;
+      }
+      transIndex++;
+      setTimeout(loadTranslations, 1200);
+    }
+
+    // Juego 3: Ordenar oraciones
+    const sentences = [
+      { words: ["I", "am", "happy"], correct: "I am happy", es: "Yo estoy feliz", emoji: "🙂" },
+      { words: ["She", "is", "a", "teacher"], correct: "She is a teacher", es: "Ella es una profesora", emoji: "📚" },
+      { words: ["They", "are", "playing", "football"], correct: "They are playing football", es: "Ellos están jugando al fútbol", emoji: "⚽" }
+    ];
+    let sentenceIndex = 0;
+    let currentSentence = [];
+
+    function loadSentence() {
+      const questionElem = document.getElementById("sentence-question");
+      const translationElem = document.getElementById("sentence-translation");
+      const emojiElem = document.getElementById("sentence-emoji");
+      const optionsContainer = document.getElementById("sentence-options");
+      const messageElem = document.getElementById("sentence-message");
+
+      if (sentenceIndex >= sentences.length) {
+        questionElem.textContent = "🎉 Juego terminado!";
+        optionsContainer.innerHTML = "";
+        translationElem.textContent = "";
+        emojiElem.innerHTML = "";
+        messageElem.textContent = "";
+        return;
+      }
+      const s = sentences[sentenceIndex];
+      currentSentence = [];
+      questionElem.textContent = "Palabras: " + s.words.join(" ");
+      translationElem.textContent = s.es;
+      emojiElem.innerHTML = s.emoji;
+      optionsContainer.innerHTML = "";
+      messageElem.textContent = "";
+      s.words.forEach(w => {
+        const btn = document.createElement("button");
+        btn.textContent = w;
+        btn.onclick = () => pickWord(w);
+        optionsContainer.appendChild(btn);
+      });
+    }
+
+    function pickWord(word) {
+      const s = sentences[sentenceIndex];
+      currentSentence.push(word);
+      const messageElem = document.getElementById("sentence-message");
+      messageElem.textContent = currentSentence.join(" ");
+      if (currentSentence.join(" ") === s.correct) {
+        messageElem.textContent = "✅ Correct! " + s.correct;
+        sentenceIndex++;
+        setTimeout(loadSentence, 1200);
+      }
+    }
+  </script>
+</body>
+</html>

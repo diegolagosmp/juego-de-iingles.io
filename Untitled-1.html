@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Preguntas de Tecnología</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #f2f2f2;
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      height: 100vh;
+      gap: 20px;
+    }
+    .container {
+      background-color: #fff;
+      padding: 30px;
+      border-radius: 12px;
+      width: 70%;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    }
+    .sidebar {
+      width: 25%;
+      background: #ffffff;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.08);
+      height: fit-content;
+    }
+    h1 { font-size: 28px; margin-bottom: 15px; }
+    .author { font-size: 13px; color: #888; text-align: right; margin-bottom: 10px; }
+    input, button {
+      padding: 10px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      margin-bottom: 10px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    button {
+      background-color: #3498db;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    button:hover { background-color: #2980b9; }
+    .cards { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; }
+    .card {
+      width: 90px; height: 120px; border-radius: 10px;
+      display: flex; justify-content: center; align-items: center;
+      color: white; font-weight: bold; cursor: pointer;
+      transition: transform 0.3s; text-align: center;
+    }
+    .card:hover { transform: scale(1.08); }
+    .red { background-color: #e74c3c; }
+    .green { background-color: #2ecc71; }
+    .yellow { background-color: #f1c40f; color: #000; }
+    .blue { background-color: #3498db; }
+    .hidden { display: none; }
+    #question { font-size: 20px; margin: 20px 0; }
+    #timer { font-size: 16px; font-weight: bold; }
+    #progress-bar {
+      height: 8px; background-color: #3498db;
+      border-radius: 5px; margin: 10px 0;
+      transition: width 1s linear;
+    }
+    .fade-in { animation: fadeIn 0.5s; }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px);}
+      to   { opacity: 1; transform: translateY(0);}
+    }
+    .scoreboard h3 { font-size: 18px; margin-bottom: 8px; }
+    .scoreboard ul { list-style: none; padding: 0; }
+    .scoreboard li { margin: 5px 0; font-size: 14px; }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <div class="author">Diego Lagos y Tiago Vázquez</div>
+  <h1>Preguntas de Tecnología</h1>
+
+  <input type="text" id="username" placeholder="Ingresa tu nombre">
+  <button onclick="startMenu()">Empezar</button>
+
+  <div id="menu" class="hidden">
+    <div class="cards">
+      <div class="card red" onclick="startGame('dificil')">Difícil</div>
+      <div class="card green" onclick="startGame('intermedio')">Intermedio</div>
+      <div class="card blue" onclick="startGame('facil')">Fácil</div>
+      <div class="card yellow" onclick="startGame('muyfacil')">Muy Fácil</div>
+    </div>
+  </div>
+
+  <div id="game" class="hidden">
+    <p id="question"></p>
+    <div id="timer">Tiempo: <span id="time">20</span>s</div>
+    <div id="progress-bar"></div>
+    <button onclick="correctAnswer()">Correcta</button>
+    <button onclick="incorrectAnswer()">Incorrecta</button>
+    <button onclick="goToMenu()">Volver al Inicio</button>
+  </div>
+
+  <div id="result" class="hidden">
+    <h2 id="resultText"></h2>
+    <button onclick="goToMenu()">Volver al menú</button>
+  </div>
+</div>
+
+<div class="sidebar">
+  <div class="scoreboard">
+    <h3>🏆 Marcador</h3>
+    <ul id="scoreList"></ul>
+    <button onclick="clearScores()" style="background-color:#e74c3c;">Borrar marcador</button>
+  </div>
+</div>
+
+<script>
+const levels = ["muyfacil", "facil", "intermedio", "dificil"];
+const questions = {
+  dificil: ["¿Qué es IPv6?", "¿Qué es IA fuerte?", "¿Computación cuántica?", "¿Algoritmo de aprendizaje profundo?"],
+  intermedio: ["¿Qué es una API?", "Función de sistema operativo?", "¿Qué es un firewall?", "RAM vs ROM?"],
+  facil: ["¿Qué hace una computadora?", "¿Qué es una contraseña?", "Uso de un ratón?", "¿Por qué apagar bien?"],
+  muyfacil: ["¿Qué es una tablet?", "¿Qué es un botón de encendido?", "¿Qué es una pantalla?", "¿Qué es un teclado?"]
+};
+
+let currentQuestions = [], currentIndex = 0, timeLeft = 20, timer, currentLevel = '', username = '', score = 0;
+
+function startMenu() {
+  username = document.getElementById('username').value.trim();
+  if (!username) { alert("Ingresa tu nombre para jugar."); return; }
+  document.getElementById('menu').classList.remove('hidden');
+  document.getElementById('username').disabled = true;
+  loadScores();
+}
+
+function startGame(level) {
+  currentLevel = level;
+  currentQuestions = questions[level];
+  currentIndex = 0;
+  document.getElementById('menu').classList.add('hidden');
+  document.getElementById('result').classList.add('hidden');
+  document.getElementById('game').classList.remove('hidden');
+  showQuestion();
+}
+
+function showQuestion() {
+  clearInterval(timer);
+  timeLeft = 20;
+  document.getElementById('time').textContent = timeLeft;
+  document.getElementById('question').textContent = currentQuestions[currentIndex];
+  document.getElementById('question').classList.add('fade-in');
+  updateProgressBar();
+
+  timer = setInterval(() => {
+    timeLeft--;
+    document.getElementById('time').textContent = timeLeft;
+    updateProgressBar();
+    if (timeLeft <= 0) {
+      clearInterval(timer);
+      alert('⏰ ¡Tiempo agotado!');
+      incorrectAnswer();
+    }
+  }, 1000);
+}
+
+function correctAnswer() {
+  clearInterval(timer);
+  score++;
+  flashBackground('green');
+  setTimeout(() => nextQuestion(), 500);
+}
+
+function incorrectAnswer() {
+  clearInterval(timer);
+  flashBackground('red');
+  setTimeout(() => nextQuestion(), 500);
+}
+
+function nextQuestion() {
+  currentIndex++;
+  if (currentIndex < currentQuestions.length) {
+    showQuestion();
+  } else {
+    goToNextLevelOrFinish();
+  }
+}
+
+function flashBackground(color) {
+  const gameDiv = document.getElementById('game');
+  gameDiv.style.backgroundColor = color;
+  setTimeout(() => { gameDiv.style.backgroundColor = ''; }, 400);
+}
+
+function goToNextLevelOrFinish() {
+  let nextIndex = levels.indexOf(currentLevel) + 1;
+  if (nextIndex < levels.length) {
+    alert(`✅ Completaste ${currentLevel}! Vas al siguiente nivel: ${levels[nextIndex]}`);
+    startGame(levels[nextIndex]);
+  } else {
+    saveScore();
+    document.getElementById('game').classList.add('hidden');
+    document.getElementById('result').classList.remove('hidden');
+    document.getElementById('resultText').textContent = `🎉 ${username}, completaste todos los niveles. Total: ${score} respuestas correctas.`;
+  }
+}
+
+function goToMenu() {
+  clearInterval(timer);
+  document.getElementById('game').classList.add('hidden');
+  document.getElementById('result').classList.add('hidden');
+  document.getElementById('menu').classList.add('hidden');
+  document.getElementById('username').disabled = false;
+  document.getElementById('username').value = '';
+}
+
+function updateProgressBar() {
+  const progress = (timeLeft / 20) * 100;
+  document.getElementById('progress-bar').style.width = progress + '%';
+}
+
+function saveScore() {
+  let scores = JSON.parse(localStorage.getItem('scores')) || [];
+  scores.push({ name: username, score: score });
+  localStorage.setItem('scores', JSON.stringify(scores));
+  loadScores();
+}
+
+function loadScores() {
+  let scores = JSON.parse(localStorage.getItem('scores')) || [];
+  scores.sort((a, b) => b.score - a.score);
+  let list = '';
+  scores.slice(0, 5).forEach(s => {
+    list += `<li>${s.name}: ${s.score}</li>`;
+  });
+  document.getElementById('scoreList').innerHTML = list;
+}
+
+function clearScores() {
+  if (confirm('¿Seguro que quieres borrar todo el marcador?')) {
+    localStorage.removeItem('scores');
+    loadScores();
+  }
+}
+</script>
+
+</body>
+</html>
