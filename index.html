@@ -291,7 +291,7 @@
       }
 
       const t = translations[transIndex];
-      qElem.textContent = `Which is the correct English word for this emoji?`;
+      qElem.textContent = `what is this?`;
       emojiElem.textContent = t.emoji;
       messageElem.textContent = "";
       counterElem.textContent = `Correct answers: ${transCorrectCount}`;
@@ -381,7 +381,6 @@
       }
 
       const s = sentences[sentenceIndex];
-      questionElem.textContent = "Select the words in the correct order to form the sentence:";
       translationElem.textContent = "Translation: " + s.translation;
       emojiElem.textContent = s.emoji;
       messageElem.textContent = "";
